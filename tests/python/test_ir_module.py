@@ -1,5 +1,5 @@
-from transform import prim_func
-from .transform import tir as T
+import tvm
+from tvm.script import tir as T
 
 
 
@@ -17,7 +17,7 @@ def matmul(a: T.handle, b: T.handle, c: T.handle) -> None:  # pylint: disable=no
 
 
 def test_func():
-    func = t.prim_func(matmul)
+    func = T.prim_func(matmul)
 
 if __name__ == "__main__":
     test_func()
