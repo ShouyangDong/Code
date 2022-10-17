@@ -157,4 +157,3 @@ if __name__ == "__main__":
     t = timer_f(a, b, c).mean
     GOPS = num_ops / (t * 1e3) / 1e6
     print("average time cost of %d runs = %g ms, %g GOPS." % (num_runs, t * 1e3, GOPS))
-
