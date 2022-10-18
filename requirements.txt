@@ -8,3 +8,8 @@ pytest
 typing-extensions>=3.10
 pydocstringformatter==0.7.2
 pyupgrade
+bert-tensorflow
+dopamine-rl==3.0.1
+regex
+tensor2tensor
+tensorflow==1.15
