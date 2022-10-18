@@ -239,8 +239,7 @@ def code_to_tokens(code):
             del token_tuples[-2]
             logging.vlog(
                 5,
-                "Tokenization for `%s` was sanitized. Now token tuples "
-                "are `%s`.",
+                "Tokenization for `%s` was sanitized. Now token tuples " "are `%s`.",
                 code,
                 token_tuples,
             )
@@ -505,7 +504,9 @@ def split_long_token(token_string, max_output_token_length):
     )
     remainder_part = [token_string[-remainder_length:]] if remainder_length else []
     split_token = even_parts + remainder_part
-    assert split_token, "while wrapping >>{}<< into >{!r}<".format(token_string, split_token)
+    assert split_token, "while wrapping >>{}<< into >{!r}<".format(
+        token_string, split_token
+    )
     assert all(
         [len(t) <= max_output_token_length for t in split_token]
     ), "Got split_token >>>%r<<<, which contains tokens longer than %d." % (
