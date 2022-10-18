@@ -2,8 +2,9 @@ import tvm
 from tvm.script import tir as T
 
 
-
-def matmul(a: T.handle, b: T.handle, c: T.handle) -> None:  # pylint: disable=no-self-argument
+def matmul(
+    a: T.handle, b: T.handle, c: T.handle
+) -> None:  # pylint: disable=no-self-argument
     T.func_attr({"global_symbol": "matmul", "tir.noalias": True})
     A = T.match_buffer(a, (1024, 1024), "float32")
     B = T.match_buffer(b, (1024, 1024), "float32")
@@ -18,6 +19,7 @@ def matmul(a: T.handle, b: T.handle, c: T.handle) -> None:  # pylint: disable=no
 
 def test_func():
     func = T.prim_func(matmul)
+
 
 if __name__ == "__main__":
     test_func()

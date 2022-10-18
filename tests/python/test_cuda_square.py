@@ -105,11 +105,19 @@ def test_gemm():
         timer_f = f.time_evaluator(f.entry_name, dev, number=num_runs)
         t = timer_f(a, b, c).mean
         GFLOPS = num_flops / (t * 1e3) / 1e6
-        print("average time cost of %d runs = %g ms, %g GFLOPS." % (num_runs, t * 1e3, GFLOPS))
+        print(
+            "average time cost of %d runs = %g ms, %g GFLOPS."
+            % (num_runs, t * 1e3, GFLOPS)
+        )
 
     for device in ["cuda", "opencl", "rocm", "nvptx", "vulkan"]:
         with tvm.transform.PassContext(
-            config={"tir.UnrollLoop": {"auto_max_step": 128, "explicit_unroll": device != "cuda"}}
+            config={
+                "tir.UnrollLoop": {
+                    "auto_max_step": 128,
+                    "explicit_unroll": device != "cuda",
+                }
+            }
         ):
             check_device(device)
 

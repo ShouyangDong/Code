@@ -16,7 +16,9 @@ def matmul_add(N, L, M, dtype):
         (N, M),
         lambda i, j: te.sum(A[i, k] * B[k, j], axis=k),
         name="matmul",
-        attrs={"layout_free_placeholders": [B]},  # enable automatic layout transform for tensor B
+        attrs={
+            "layout_free_placeholders": [B]
+        },  # enable automatic layout transform for tensor B
     )
     out = te.compute((N, M), lambda i, j: matmul[i, j] + C[i, j], name="out")
 
@@ -25,7 +27,9 @@ def matmul_add(N, L, M, dtype):
 
 target = tvm.target.Target("llvm")
 N = L = M = 1024
-task = tvm.auto_scheduler.SearchTask(func=matmul_add, args=(N, L, M, "float32"), target=target)
+task = tvm.auto_scheduler.SearchTask(
+    func=matmul_add, args=(N, L, M, "float32"), target=target
+)
 
 # Inspect the computational graph
 print("Computational DAG:")
@@ -94,7 +98,9 @@ def resume_search(task, log_file):
     cost_model = auto_scheduler.XGBModel()
     cost_model.update_from_file(log_file)
     search_policy = auto_scheduler.SketchPolicy(
-        task, cost_model, init_search_callbacks=[auto_scheduler.PreloadMeasuredStates(log_file)]
+        task,
+        cost_model,
+        init_search_callbacks=[auto_scheduler.PreloadMeasuredStates(log_file)],
     )
     tune_option = auto_scheduler.TuningOptions(
         num_measure_trials=5, measure_callbacks=[auto_scheduler.RecordToFile(log_file)]

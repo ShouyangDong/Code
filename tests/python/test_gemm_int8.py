@@ -3,7 +3,7 @@ from gc import callbacks
 from timeit import repeat
 import autotvm
 
-"Example code to perform int8 GEMM"
+"""Example code to perform int8 GEMM."""
 import logging
 import sys
 import numpy as np
@@ -40,7 +40,8 @@ def gemm_int8(n, m, l):
         "tile_k",
         cfg.axis(k),
         num_outputs=3,
-        filter=lambda entity: entity.size[2] == 4 and entity.size[0] * 2 >= entity.size[1],
+        filter=lambda entity: entity.size[2] == 4
+        and entity.size[0] * 2 >= entity.size[1],
     )
 
     ko, kt, ki = cfg["tile_k"].apply(s, CC, k)
@@ -124,7 +125,7 @@ if __name__ == "__main__":
     tuner.tune(
         n_trial=1000,
         measure_option=measure_option,
-        callbacks=[autotvm.callback.log_to_file(log_name)]
+        callbacks=[autotvm.callback.log_to_file(log_name)],
     )
 
     dispatch_context = autotvm.apply_history_best(log_name)
