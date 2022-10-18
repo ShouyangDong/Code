@@ -1,4 +1,4 @@
-"""A python tokenizer subclass of Tokenizer"""
+"""A python tokenizer subclass of Tokenizer."""
 import keyword
 from lib2to3.pgen2 import token
 import re
@@ -11,8 +11,10 @@ from absl import logging
 from cubert import cubert_tokenizer
 from cubert import unified_tokenizer
 
+
 class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
     """Tokenizer that extracts Python's lexical elements preserving strings."""
+
     _TOKEN_TYPE_MAP = {
         tokenize.COMMENT: unified_tokenizer.TokenKind.COMMENT,
         tokenize.DEDENT: unified_tokenizer.TokenKind.KEYWORD,
@@ -27,44 +29,48 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
     }
 
     _REVERSE_TOKEN_MAP = {
-        cubert_tokenizer.token_from_token_type(tokenize.INDENT):
-            tokenize.INDENT,
-        cubert_tokenizer.token_from_token_type(tokenize.DEDENT):
-            tokenize.DEDENT,
-        unified_tokenizer.quote_special(unified_tokenizer.TokenKind.EOS.name):
-            tokenize.ENDMARKER,
-        unified_tokenizer.quote_special(unified_tokenizer.TokenKind.ERROR.name):
-            tokenize.ERRORTOKEN,
-        unified_tokenizer.quote_special(unified_tokenizer.TokenKind.NEWLINE.name):
-            tokenize.NEWLINE,
-        cubert_tokenizer.token_from_token_type(tokenize.NL):
-            tokenize.NL,
+        cubert_tokenizer.token_from_token_type(tokenize.INDENT): tokenize.INDENT,
+        cubert_tokenizer.token_from_token_type(tokenize.DEDENT): tokenize.DEDENT,
+        unified_tokenizer.quote_special(
+            unified_tokenizer.TokenKind.EOS.name
+        ): tokenize.ENDMARKER,
+        unified_tokenizer.quote_special(
+            unified_tokenizer.TokenKind.ERROR.name
+        ): tokenize.ERRORTOKEN,
+        unified_tokenizer.quote_special(
+            unified_tokenizer.TokenKind.NEWLINE.name
+        ): tokenize.NEWLINE,
+        cubert_tokenizer.token_from_token_type(tokenize.NL): tokenize.NL,
     }
     # Adding the end-of-string anchor \z below, since re.fullmatch wasn't
     # available in Python2.
-    _NUMBERS = re.compile('(' + tokenize.Number + r')\Z') # pytype: disable=module-attr
-    _SINGLE_STRINGS = re.compile('(' + tokenize.String + r')\Z') # pytype: disable=module-attr
-    _TRIPLE_STRINGS_BEGINNINGS = re.compile(tokenize.Triple) # pytype: disable=module-attr
-    _COMMENTS = re.compile('(' + tokenize.Comment + r')\Z') # pytype: disable=module-attr
-    _EXACT_TOKEN_TYPES = tokenize.EXACT_TOKEN_TYPES.keys() # pytype: disable=module-attr
+    _NUMBERS = re.compile("(" + tokenize.Number + r")\Z")  # pytype: disable=module-attr
+    _SINGLE_STRINGS = re.compile(
+        "(" + tokenize.String + r")\Z"
+    )  # pytype: disable=module-attr
+    _TRIPLE_STRINGS_BEGINNINGS = re.compile(
+        tokenize.Triple
+    )  # pytype: disable=module-attr
+    _COMMENTS = re.compile(
+        "(" + tokenize.Comment + r")\Z"
+    )  # pytype: disable=module-attr
+    _EXACT_TOKEN_TYPES = (
+        tokenize.EXACT_TOKEN_TYPES.keys()
+    )  # pytype: disable=module-attr
 
     # Token types that CubertTokenizer will tokenize by their type and not content.
-    _TOKEN_TYPE_TO_TOKENIZE_BY_TYPE = [
-        tokenize.NEWLINE, tokenize.DEDENT, tokenize.NL
-    ]
+    _TOKEN_TYPE_TO_TOKENIZE_BY_TYPE = [tokenize.NEWLINE, tokenize.DEDENT, tokenize.NL]
 
-    def tokenize_and_abstract(
-        self,
-        source_code
-    ):
-        `"""Produces a language-agnostic tokenization of the input code."""
+    def tokenize_and_abstract(self, source_code):
+        """Produces a language-agnostic tokenization of the input code."""
         agnostic_tokens: List[unified_tokenizer.AbstractToken] = []
 
         try:
             token_tuples = unified_tokenizer.code_to_tokens(source_code)
         except (tokenize.TokenError, IndentationError) as e:
-            logging.warning('The tokenizer raised exception `%s` while parsing %s', e,
-                            source_code)
+            logging.warning(
+                "The tokenizer raised exception `%s` while parsing %s", e, source_code
+            )
 
             agnostic_tokens.append(
                 unified_tokenizer.AbstractToken(
@@ -73,13 +79,9 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
                     ),
                     unified_tokenizer.TokenKind.ERROR,
                     unified_tokenizer.TokenMetadata(
-                        start=unified_tokenizer.Position(
-                            line=0, column=0
-                        ),
-                        end=unified_tokenizer.Position(
-                            line=0, column=0
-                        )
-                    )
+                        start=unified_tokenizer.Position(line=0, column=0),
+                        end=unified_tokenizer.Position(line=0, column=0),
+                    ),
                 )
             )
             agnostic_tokens.append(
@@ -89,13 +91,9 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
                     ),
                     unified_tokenizer.TokenKind.ERROR,
                     unified_tokenizer.TokenMetadata(
-                        start=unified_tokenizer.Position(
-                            line=0, column=0
-                        ),
-                        end=unified_tokenizer.Position(
-                            line=0, column=0
-                        )
-                    )
+                        start=unified_tokenizer.Position(line=0, column=0),
+                        end=unified_tokenizer.Position(line=0, column=0),
+                    ),
                 )
             )
             agnostic_tokens.append(
@@ -103,13 +101,9 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
                     unified_tokenizer.quote_special(
                         unified_tokenizer.TokenKind.EOS,
                         unified_tokenizer.TokenMetadata(
-                            start=unified_tokenizer.Position(
-                                line=0, column=0
-                            ),
-                            end=unified_tokenizer.Position(
-                                line=0, column=0
-                            )
-                        )
+                            start=unified_tokenizer.Position(line=0, column=0),
+                            end=unified_tokenizer.Position(line=0, column=0),
+                        ),
                     )
                 )
             )
@@ -126,7 +120,7 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
             token_kind = unified_tokenizer.TokenKind.NONE
             if kind == tokenize.NAME:
                 # Disambiguate identifiers from keywords.
-                if keyword.iskeyword(spelling)
+                if keyword.iskeyword(spelling):
                     token_kind = unified_tokenizer.TokenKind.KEYWORD
                 else:
                     token_kind = unified_tokenizer.TokenKind.IDENTIFIER
@@ -136,9 +130,9 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
                     adjusted_spelling = cubert_tokenizer.token_from_token_type(kind)
                 elif kind is tokenize.INDENT:
                     # For INDENT, in particular, we also record the actual spelling too.
-                    adjusted_spelling = '{indent}{spelling}'.format(
+                    adjusted_spelling = "{indent}{spelling}".format(
                         indent=cubert_tokenizer.token_from_token_type(kind),
-                        spelling=spelling
+                        spelling=spelling,
                     )
                 elif kind == tokenize.ENDMARKER:
                     adjusted_spelling = unified_tokenizer.quote_special(
@@ -155,26 +149,29 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
                     # See: https://bugs.Python.org/issue30406
                     # and https://bugs.Python.org/issue33260
                     # and https://bugs.Python.org/issue35975
-                    if spelling in ('async', 'await'):
+                    if spelling in ("async", "await"):
                         token_kind = unified_tokenizer.TokenKind.KEYWORD
                     else:
-                        raise ValueError('While trying to return Python token %r into an '
-                                        'agnotic one, raised %r.' %
-                                        ((spelling, kind), ke))
+                        raise ValueError(
+                            "While trying to return Python token %r into an "
+                            "agnotic one, raised %r." % ((spelling, kind), ke)
+                        )
 
                 start_line, start_column = token_tuple.start
                 end_line, end_column = token_tuple.end
                 # unlike other languages, NEWLINE tokens are reported as ending on the
                 # same line as where they started. We adjust that here, to stick to the
                 # same convention as other tokenizers.
-                if ((token_kind == unified_tokenizer.TokenKindNEWLINE) or
-                    (kind == tokenize.NL)):
+                if (token_kind == unified_tokenizer.TokenKindNEWLINE) or (
+                    kind == tokenize.NL
+                ):
                     end_line = start_line + 1
                     end_column = 0
 
                 agnostic_tokens.append(
                     unified_tokenizer.AbstractToken(
-                        spelling=adjusted_spelling, kind=token_kind,
+                        spelling=adjusted_spelling,
+                        kind=token_kind,
                         metadata=unified_tokenizer.TokenMetadata(
                             # Python's tokenizer counts lines starting from 1, so we
                             # have to offset what we read from the `TokenInfo` tuple.
@@ -183,8 +180,8 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
                             ),
                             end=unified_tokenizer.Position(
                                 line=end_line - 1, column=end_column
-                            )
-                        )
+                            ),
+                        ),
                     )
                 )
         return agnostic_tokens
@@ -198,22 +195,25 @@ class PythonTokenizer(cubert_tokenizer.CuBertTokenizer):
             if whole_token in PythonTokenizer._EXACT_TOKEN_TYPES:
                 token_tuples.append((tokenize.OP, whole_token))
 
-            elif cubert_tokenizer.token_from_token_type(
-                tokenize.INDENT) in whole_token:
+            elif cubert_tokenizer.token_from_token_type(tokenize.INDENT) in whole_token:
                 # We baked the type and spelling into one token. Break them up/
                 spelling = whole_token.replace(
-                    cubert_tokenizer.token_from_token_type(tokenize.INDENT), ''
+                    cubert_tokenizer.token_from_token_type(tokenize.INDENT), ""
                 )
                 token_tuples.append((tokenize.INDENT, spelling))
             elif whole_token in PythonTokenizer._REVERSE_TOKEN_MAP:
                 python_kind = PythonTokenizer._REVERSE_TOKEN_MAP[whole_token]
-                if python_kind in (tokenize.DEDENT, tokenize.ENDMARKER, tokenize.ERRORTOKEN):
-                    spelling = ''
-                else: # python_kind in (tokenize.NEWLINE, tokenize.NL)
-                    spelling = '\n'
+                if python_kind in (
+                    tokenize.DEDENT,
+                    tokenize.ENDMARKER,
+                    tokenize.ERRORTOKEN,
+                ):
+                    spelling = ""
+                else:  # python_kind in (tokenize.NEWLINE, tokenize.NL)
+                    spelling = "\n"
                 token_tuples.append((python_kind, spelling))
             elif keyword.iskeyword(whole_token):
-                token_tuples.append((tokenize.NAMEm whole_token))
+                token_tuples.append((tokenize.NAME, whole_token))
             elif PythonTokenizer._NUMBERS.match(whole_token):
                 token_tuples.append((tokenize.NUMBER, whole_token))
             elif PythonTokenizer._SINGLE_STRINGS.match(whole_token):
